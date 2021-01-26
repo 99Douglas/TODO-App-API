@@ -1,7 +1,12 @@
-module.exports = (app) => { app.get('/tarefas', (req, res) => {
-    res.send('Rota ativada com GET e recurso tarefas: valores de tarefas devem ser retornados')
-});
+const Tarefa = require('../models/tarefa-model')
+
+module.exports = (app, bd) => { 
+    app.get('/tarefas', (req, res) => {
+        res.send(bd.tarefas)
+    });
     app.post('/tarefas', (req, res) => {
-    res.send('Rota POST de tarefa ativada: tarefa adicionada ao banco de dados')
-});
+        const novaTarefa = new Tarefa(req.body.titulo, req.body.descricao, req.body.status, req.body.dataDeCriacao);
+        bd.tarefas.push(novaTarefa);
+        res.send('Rota POST de tarefa ativada: tarefa adicionada ao banco de dados');
+    });
 }
