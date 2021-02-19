@@ -1,39 +1,51 @@
-const Usuario = require('../models/usuario-model');
+const UsuariosDao = require('../DAO/usuarios-DAO')
 
 module.exports = (app, bd) => { 
-    app.get('/usuario', (req, res) => {
-        res.send(bd.usuarios);
+
+    const usuariosDAO = new UsuariosDao(bd);
+
+    app.get('/usuarios', async (req, res) => {
+        try {
+            const retornoPositivo = await usuariosDAO.listaUsuarios();
+            res.status(200).send(retornoPositivo);
+        } catch (erro) {
+            res.status(400).send(erro);
+        };
     });
-    app.get('/usuario/:email', (req, res) => {
-        for (let usuario of bd.usuarios) {
-            if (usuario._email == req.params.email) {
-                res.send(usuario);
-            }
-        }
-        res.send('Email não encontrado no banco de dados')
+
+    app.get('/usuarios/:id', async (req, res) => {
+        try {
+            const retornoPositivo = await usuariosDAO.buscaUmUsuario(req.params.id);
+            res.status(200).send(retornoPositivo);
+        } catch (erro) {
+            res.status(400).send(erro);
+        };
     });
-    app.post('/usuario', (req, res) => {
-        const novoUsuario = new Usuario(req.body.nome, req.body.email, req.body.senha);
-        bd.usuarios.push(novoUsuario);
-        res.send('Rota POST de tarefa ativada: usuario adicionado ao banco de dados');
+
+    app.post('/usuarios', async (req, res) => {
+        try {
+            const retornoPositivo = await usuariosDAO.adicionaUsuario([req.body.nome, req.body.email, req.body.senha]);
+            res.status(200).send(retornoPositivo)
+        } catch (erro) {
+            res.status(400).send(erro);
+        };
     });
-    app.delete('/usuario/:email', (req, res) => {
-        let novoArray = [];
-        for (let i = 0; i < bd.usuarios.length; i++) {
-            if (bd.usuarios[i]._email !== req.params.email) {
-                novoArray.push(bd.usuarios[i]);
-            }
-        }
-        bd.usuarios = novoArray;
-        res.send(`Rota de deleção ativada! ${req.params.email} retirado do banco de dados.`);
+
+    app.delete('/usuarios/:id', async (req, res) => {
+        try {
+            const retornoPositivo = await usuariosDAO.deletaUsuario(req.params.id);
+            res.status(200).send(retornoPositivo)
+        } catch (erro) {
+            res.status(400).send(erro);
+        };
     });
-    app.put('/usuario/:email', (req, res) => {
-        for (let usuario of bd.usuarios) {
-            if (usuario._email == req.params.email) {
-                usuario._nome = req.body.nome;
-                usuario._senha = req.body.senha;
-            }
-        }
-        res.send(`Rota de update ativada! ${req.params.email} atualizado no banco de dados.`);
+
+    app.put('/usuarios/:id', async (req, res) => {
+        try {
+            const retornoPositivo = await usuariosDAO.atualizaUsuario([req.body.nome, req.body.email, req.body.senha, req.params.id]);
+            res.status(200).send(retornoPositivo)
+        } catch (erro) {
+            res.status(400).send(erro);
+        };
     });
 }

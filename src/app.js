@@ -1,16 +1,15 @@
 const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
 const app = express();
 const port = 8080;
 
 const tarefaController = require('./controllers/tarefa-controller');
 const usuarioController = require('./controllers/usuario-controller');
-const tarefaModel = require('./models/tarefa-model');
-const usuarioModel = require('./models/usuario-model');
-const bd = require('./infra/bd');
-
-const bodyParser = require('body-parser');
+const bd = require('./infra/sqlite-db');
 
 app.use(bodyParser.json());
+app.use(cors());
 
 tarefaController(app, bd);
 usuarioController(app, bd);
